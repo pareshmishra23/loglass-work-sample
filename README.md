@@ -2,29 +2,9 @@
 
 ## Overview
 This project is a comprehensive implementation of the Loglass work sample test, including both Java and Kotlin versions with extensive test coverage.
-
-## Project Structure
-```
-src/
-├── main/
-│   ├── java/javaversion/
-│   │   ├── Database.java
-│   │   ├── Mailer.java
-│   │   ├── Main.java
-│   │   └── UserController.java
-│   └── kotlin/
-│       ├── Database.kt
-│       ├── Mailer.kt
-│       ├── Main.kt
-│       └── UserController.kt
-└── test/
-    ├── java/javaversion/
-    │   └── ComprehensiveJUnitTest.java
-    └── kotlin/
-        ├── ComprehensiveJUnitTest.kt
-        └── ComprehensiveKotestTest.kt
-```
-
+ 
+This project demonstrates a complete end-to-end implementation of the Loglass Work Sample Test.
+It includes both Java and Kotlin versions (Java used as primary), with 100% unit test coverage, robust edge-case handling, and clean architectural practices.
 ## Features
 - User email management system
 - Automatic user type classification (EMPLOYEE vs CUSTOMER) based on email domain

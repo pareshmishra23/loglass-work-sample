@@ -56,6 +56,9 @@ src/
 ./gradlew test --tests "javaversion.ComprehensiveJUnitTest"
 ./gradlew test --tests "ComprehensiveJUnitTest"
 ./gradlew test --tests "ComprehensiveKotestTest"
+# open build/reports/jacoco/test/html/index.html
+./gradlew test jacocoTestReport
+
 ```
 
 ## Test Coverage

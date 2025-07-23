@@ -3,29 +3,43 @@ package javaversion;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Handles logic related to changing a user's email,
+ * including user type reassignment, employee count adjustment,
+ * and email confirmation status reset.
+ */
 public class UserController {
     private final Database database;
     private final Mailer mailer;
-    private static final Pattern EMAIL_PATTERN = 
-        Pattern.compile("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$");
+
+    // Added: Basic pattern check for email format
+    // to test cases as we have for better catch
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$");
 
     public UserController(Database database, Mailer mailer) {
         this.database = Objects.requireNonNull(database);
         this.mailer = Objects.requireNonNull(mailer);
     }
 
+
     public void changeEmail(String userId, String newEmail) {
         // Validate email format
-        if (!EMAIL_PATTERN.matcher(newEmail).matches()) {
-            throw new IllegalArgumentException("Invalid email format: " + newEmail);
+        if (userId==null ){
+            throw new IllegalArgumentException("Invalid Useer ID  format: " + userId);
         }
 
+        if (newEmail==null || !EMAIL_PATTERN.matcher(newEmail).matches()) {
+            throw new IllegalArgumentException("Invalid email format: " + newEmail);
+        }
+       // get  user else throw runtime  fail
         var user = database.getUserById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found. User ID: " + userId));
 
         var currentEmail = user.get("email");
+        // No change needed
         if (currentEmail.equals(newEmail)) {
-            return; // No change needed
+            return;
         }
 
         var company = database.getCompany();
@@ -36,8 +50,13 @@ public class UserController {
         var currentEmailDomain = currentEmail.split("@")[1];
         var newEmailDomain = newEmail.split("@")[1];
 
-        // Determine new user type based on email domain
-        var newUserType = newEmailDomain.equals(companyDomainName) ? "EMPLOYEE" : "CUSTOMER";
+        //  new user type based on email domain
+        String newUserType;
+        if (newEmailDomain.equalsIgnoreCase(companyDomainName)) {
+            newUserType = "EMPLOYEE";
+        } else {
+            newUserType = "CUSTOMER";
+        }
 
         // Calculate employee count delta
         var delta = 0;

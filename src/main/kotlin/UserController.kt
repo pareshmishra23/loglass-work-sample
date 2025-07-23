@@ -4,57 +4,36 @@ class UserController(
     private val database: Database,
     private val mailer: Mailer,
 ) {
-    companion object {
-        private val EMAIL_REGEX = 
-            "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$".toRegex()
-    }
 
     fun changeEmail(userId: String, newEmail: String) {
-        // Validate email format
-        if (!EMAIL_REGEX.matches(newEmail)) {
-            throw IllegalArgumentException("Invalid email format: $newEmail")
-        }
+        val user = database.getUserById(userId) ?: throw RuntimeException("User not found. User ID: $userId")
 
-        val user = database.getUserById(userId) 
-            ?: throw RuntimeException("User not found. User ID: $userId")
+        val email = user["email"]!!
 
-        val currentEmail = user["email"]!!
-        if (currentEmail == newEmail) {
-            return // No change needed
+        if (email == newEmail) {
+            return
         }
 
         val company = database.getCompany()
         val companyDomainName = company["companyDomainName"]!!
         val numberOfEmployees = company["numberOfEmployees"]!!.toInt()
 
-        val currentUserType = user["userType"]!!
-        val newEmailDomain = newEmail.split("@")[1]
+        val emailDomain = newEmail.split("@")[1]
 
-        // Determine new user type based on email domain
-        val newUserType = if (newEmailDomain == companyDomainName) "EMPLOYEE" else "CUSTOMER"
+        val newType = if (emailDomain == companyDomainName) "EMPLOYEE" else "CUSTOMER"
 
-        // Calculate employee count delta
-        val delta = when {
-            currentUserType == newUserType -> 0
-            newUserType == "EMPLOYEE" -> 1  // Customer to Employee
-            else -> -1  // Employee to Customer
-        }
-
-        val newNumberOfEmployees = numberOfEmployees + delta
-
-        // Update company data
+        val delta = if (newType == "EMPLOYEE") 1 else -1
+        val newNumber = numberOfEmployees + delta
         val newCompany = company.toMutableMap()
-        newCompany["numberOfEmployees"] = newNumberOfEmployees.toString()
+        newCompany["numberOfEmployees"] = newNumber.toString()
         newCompany["companyDomainName"] = companyDomainName
         database.saveCompany(newCompany)
 
-        // Update user data
         val newUser = user.toMutableMap()
         newUser["email"] = newEmail
-        newUser["userType"] = newUserType
-        database.saveUser(newUser)
+        newUser["userType"] = newType
 
-        // Send notification
+        database.saveUser(newUser)
         mailer.sendEmailChangedMessage(userId, newEmail)
     }
 }

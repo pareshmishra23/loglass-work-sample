@@ -1,4 +1,5 @@
 class Database {
+
     private val users: MutableList<Map<String, String>> = mutableListOf(
         mapOf(
             "userId" to "1",
@@ -25,14 +26,11 @@ class Database {
         "companyDomainName" to "loglass.co.jp",
     )
 
-    fun getUserById(userId: String): Map<String, String>? = 
-        users.find { it["userId"] == userId }
+    fun getUserById(userId: String): Map<String, String>? = users.find { it["userId"] == userId }
 
     fun saveUser(newUser: Map<String, String>) {
         val index = users.indexOfFirst { it["userId"] == newUser["userId"] }
-        if (index != -1) {
-            users[index] = newUser
-        }
+        users[index] = newUser
     }
 
     fun getCompany(): Map<String, String> = company

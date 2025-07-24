@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -26,11 +26,10 @@ jobs:
       - name: Run Tests and Generate Coverage Report
         run: ./gradlew test jacocoTestReport
 
-      - name: List contents of report directory
-        run: ls -R build/reports/jacoco/test/html || echo "No report generated"
-
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          name: jacoco-report
-          path: build/reports/jacoco/test/html
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          flags: unittests
+          name: codecov-coverage-report

@@ -1,4 +1,6 @@
-name: Run Tests with Coverage
+name: List contents of report directory
+run: ls -R build/reports/jacoco/test/html || echo "No report generated"
+
 
 on:
   push:

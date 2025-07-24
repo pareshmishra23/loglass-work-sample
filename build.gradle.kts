@@ -1,8 +1,13 @@
+
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
+    // java application run from Itellej idea and via run command
+    id("application")
     jacoco
 }
+
 
 group = "com.loglass"
 version = "1.0-SNAPSHOT"
@@ -57,4 +62,8 @@ tasks.jacocoTestReport {
 
 kotlin {
     jvmToolchain(17)
+}
+application {
+    mainClass.set("javaversion.Main") // For Java main class run
+
 }

@@ -20,23 +20,18 @@ If the domain changes to an external one (e.g., alice@example.com), the user bec
 
 If the domain changes to an internal one (e.g., michael@loglass.co.jp), and the user was a CUSTOMER, they become an EMPLOYEE, and the count increases by 1.
 
-2. As an admin, I want to make sure the email change is notified
+2.   email change is notified
    After an email change, a notification is sent using the Mailer.
 
-3. As a system, I must ensure that emails follow valid formats
-   The system rejects emails like invalid-email, alice.loglass.co.jp, or "" (empty).
+ 
 
 The format is verified using a regular expression.
-
-4. As a developer, I want the system to ignore redundant updates
-   If the email hasn’t changed (alice@loglass.co.jp to same), no update happens, and the mailer is not invoked.
-
-5. As a company, I want to track employee count accurately
-   When users change domains, employee count adjusts accordingly.
+ 
+5.   employee count accurately
 
 When two users leave the internal domain, the count can drop to zero, and that is handled correctly.
 
-🧪 Edge Case Scenarios
+Edge Case Scenarios
 6. Changing email for users with special characters
    Emails like alice+test@loglass.co.jp are accepted and updated properly.
 
@@ -73,29 +68,42 @@ When two users leave the internal domain, the count can drop to zero, and that i
 # Run Java main
 ./gradlew run --main-class=javaversion.Main
 
-# Run Kotlin main
-./gradlew run --main-class=MainKt
+# Run  main
+./gradlew run --args="arg1 arg2"
+
+# run java  project 
+ ./gradlew run
 
 # Run specific test classes
-./gradlew test --tests "javaversion.ComprehensiveJUnitTest"
-./gradlew test --tests "ComprehensiveJUnitTest"
-./gradlew test --tests "ComprehensiveKotestTest"
+./gradlew test --tests "javaversion.UserControllerTest"
+./gradlew test --tests "javaversion.DatabaseTest"
+./gradlew test --tests "javaversion.MailerTest"
+./gradlew test
 # open build/reports/jacoco/test/html/index.html
 ./gradlew test jacocoTestReport
 
 ```
 
-## Test Coverage - 100 % 
-- Database operations (CRUD)
-- Email change scenarios
-- User type conversions
-- Employee count management
-- Input validation and error handling
-- Edge cases and special characters
+#Test Coverage – 100%
+Covers full DB CRUD operations
 
-## Key Improvements
-1. Email format validation with regex patterns
-2. Enhanced error handling with clear messages
-3. Proper employee count logic with delta calculations
-4. Mock integration for isolated testing
-5. Comprehensive edge case coverage
+All email change cases handled
+
+User type switch (Employee ↔ Customer) logic tested
+
+Employee count updates validated
+
+Input checks and proper error handling added
+
+Edge cases + special characters verified
+
+#Key Improvements
+Email format now validated with regex
+
+Errors show clear, useful messages
+
+Employee count now adjusts correctly (add/remove logic)
+
+Used mocks to isolate and test properly
+
+Covered all tricky/edge inputs too

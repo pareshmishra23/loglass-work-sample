@@ -20,20 +20,21 @@ public class UserControllerTest {
     private UserController userController;
 
     @Mock
-    private Mailer mockMailer;
+    private Mailer mailer;
 
     @BeforeEach
     void setUp() {
         database = new Database();
 
-        // Add user without "isEmailConfirmed" field to test fallback
-        Map<String, String> incompleteUser = new HashMap<>();
-        incompleteUser.put("userId", "98");
-        incompleteUser.put("email", "test@loglass.co.jp");
-        incompleteUser.put("userType", "EMPLOYEE");
-        database.getAllUsers().add(incompleteUser);
+        // This is added for setup as primary
+        // Add user without "isEmailConfirmed" field to test
+        Map<String, String> mapUser = new HashMap<>();
+        mapUser.put("userId", "98");
+        mapUser.put("email", "test@loglass.co.jp");
+        mapUser.put("userType", "EMPLOYEE");
+        database.getAllUsers().add(mapUser);
 
-        userController = new UserController(database, mockMailer);
+        userController = new UserController(database, mailer);
     }
 
     @Test
@@ -46,7 +47,7 @@ public class UserControllerTest {
         assertEquals("michael@loglass.co.jp", user.get().get("email"));
         assertEquals("EMPLOYEE", user.get().get("userType"));
         assertEquals("3", database.getCompany().get("numberOfEmployees"));
-        verify(mockMailer).sendEmailChangedMessage("3", "michael@loglass.co.jp");
+        verify(mailer).sendEmailChangedMessage("3", "michael@loglass.co.jp");
     }
 
     @Test
@@ -58,7 +59,7 @@ public class UserControllerTest {
         assertEquals("alice@example.com", user.get().get("email"));
         assertEquals("CUSTOMER", user.get().get("userType"));
         assertEquals("1", database.getCompany().get("numberOfEmployees"));
-        verify(mockMailer).sendEmailChangedMessage("1", "alice@example.com");
+        verify(mailer).sendEmailChangedMessage("1", "alice@example.com");
     }
 
     @Test
@@ -69,7 +70,7 @@ public class UserControllerTest {
         Optional<Map<String, String>> user = database.getUserById("1");
         assertEquals("EMPLOYEE", user.get().get("userType"));
         assertEquals("2", database.getCompany().get("numberOfEmployees"));
-        verify(mockMailer).sendEmailChangedMessage("1", "alice.new@loglass.co.jp");
+        verify(mailer).sendEmailChangedMessage("1", "alice.new@loglass.co.jp");
     }
 
     @Test
@@ -78,7 +79,7 @@ public class UserControllerTest {
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> userController.changeEmail("999", "test@example.com"));
         assertEquals("User not found. User ID: 999", ex.getMessage());
-        verifyNoInteractions(mockMailer);
+        verifyNoInteractions(mailer);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class UserControllerTest {
         // Throws exception for malformed email address
         assertThrows(IllegalArgumentException.class,
                 () -> userController.changeEmail("1", "invalid-email"));
-        verifyNoInteractions(mockMailer);
+        verifyNoInteractions(mailer);
     }
 
     @Test
@@ -94,7 +95,7 @@ public class UserControllerTest {
         // Returns early if new email is same as current email
         userController.changeEmail("1", "alice@loglass.co.jp");
         assertEquals("2", database.getCompany().get("numberOfEmployees"));
-        verifyNoInteractions(mockMailer);
+        verifyNoInteractions(mailer);
     }
 
     @Test

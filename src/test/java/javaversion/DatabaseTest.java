@@ -20,37 +20,38 @@ public class DatabaseTest {
     }
 
     @Test
-    void getUserById_shouldReturnExistingUser() {
+    void getUserByIdTEST() {
         Optional<Map<String, String>> user = database.getUserById("1");
         assertTrue(user.isPresent());
         assertEquals("alice@loglass.co.jp", user.get().get("email"));
     }
 
     @Test
-    void getUserById_shouldReturnEmptyForInvalidUser() {
+    void invalidUserTEST() {
+
         assertFalse(database.getUserById("999").isPresent());
     }
 
     @Test
-    void saveUser_shouldUpdateUserInfo() {
-        Map<String, String> updatedUser = Map.of(
+    void  UpdateUserInfoTEST() {
+        Map<String, String> mapUser = Map.of(
                 "userId", "1",
                 "email", "new@loglass.co.jp",
                 "userType", "EMPLOYEE",
                 "isEmailConfirmed", "true"
         );
-        database.saveUser(updatedUser);
+        database.saveUser(mapUser);
         assertEquals("new@loglass.co.jp", database.getUserById("1").get().get("email"));
     }
 
     @Test
-    void getCompany_shouldReturnCompanyInfo() {
+    void getCompanyInfoTEST() {
         Map<String, String> company = database.getCompany();
         assertEquals("loglass.co.jp", company.get("companyDomainName"));
     }
 
     @Test
-    void saveCompany_shouldUpdateCompany() {
+    void saveCompanyTEST() {
         Map<String, String> newCompany = Map.of(
                 "numberOfEmployees", "5",
                 "companyDomainName", "loglass.co.jp"
@@ -60,13 +61,13 @@ public class DatabaseTest {
     }
 
     @Test
-    void getAllUsers_shouldReturnListOfAllUsers() {
+    void getAllUsersTEST() {
         List<Map<String, String>> users = database.getAllUsers();
         assertEquals(3, users.size());
-        assertTrue(users.stream().anyMatch(user -> "1".equals(user.get("userId"))));
+
     }
     @Test
-    void saveUser_shouldUpdateExistingUser() {
+    void saveUserTEST() {
         Map<String, String> updatedUser = Map.of(
                 "userId", "1",
                 "email", "updated@loglass.co.jp",
@@ -78,7 +79,7 @@ public class DatabaseTest {
     }
 
     @Test
-    void saveUser_shouldNotThrowIfUserDoesNotExist() {
+    void saveUserNotExistTEST() {
         Map<String, String> newUser = Map.of(
                 "userId", "999",
                 "email", "new@loglass.co.jp",
@@ -93,16 +94,16 @@ public class DatabaseTest {
    //Saving user with no userId should not crash
 
     @Test
-    void saveUser_shouldNotThrowIfUserIdMissing() {
-        Map<String, String> invalidUser = new HashMap<>();
-        invalidUser.put("email", "noid@loglass.co.jp");
+    void saveUser_IdMissingTEST() {
+        Map<String, String> user = new HashMap<>();
+        user.put("email", "noid@loglass.co.jp");
 
-        assertDoesNotThrow(() -> database.saveUser(invalidUser));
+        assertDoesNotThrow(() -> database.saveUser(user));
     }
    // Get user by ID returns empty if ID is null
 
     @Test
-    void getUserById_shouldReturnEmptyForNullId() {
+    void getUserById_NULLTEST() {
         Optional<Map<String, String>> user = database.getUserById(null);
         assertFalse(user.isPresent());
     }

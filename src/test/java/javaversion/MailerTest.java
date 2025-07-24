@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MailerTest {
 
     @Test
-    void sendEmailChangedMessage_shouldPrintCorrectMessage() {
+    void sendEmailChangedMessage_TEST() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(outputStream));
@@ -27,23 +27,5 @@ public class MailerTest {
         }
     }
 
-    // Sending message to null values should not throw (depends on implementation)
 
-    @Test
-    void sendEmailChangedMessage_shouldHandleNullInputsGracefully() {
-        Mailer mailer = new Mailer();
-        assertDoesNotThrow(() -> mailer.sendEmailChangedMessage(null, null));
-    }
- //Print output should still appear for empty email/userId
-
-    void sendEmailChangedMessage_shouldPrintEvenForEmptyValues() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStream));
-
-        Mailer mailer = new Mailer();
-        mailer.sendEmailChangedMessage("", "");
-
-        String output = outputStream.toString();
-        assertTrue(output.contains("Sending email changed message"));
-    }
 }

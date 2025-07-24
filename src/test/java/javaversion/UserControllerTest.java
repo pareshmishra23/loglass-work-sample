@@ -37,9 +37,9 @@ public class UserControllerTest {
         userController = new UserController(database, mailer);
     }
 
+    // Changes user type from CUSTOMER to EMPLOYEE based on domain match
     @Test
-    void changeEmail_shouldConvertCustomerToEmployeeCorrectly() {
-        // Changes user type from CUSTOMER to EMPLOYEE based on domain match
+    void changeEmail_convertCustomer_EmployeeTEST() {
         userController.changeEmail("3", "michael@loglass.co.jp");
 
         Optional<Map<String, String>> user = database.getUserById("3");
@@ -50,11 +50,10 @@ public class UserControllerTest {
         verify(mailer).sendEmailChangedMessage("3", "michael@loglass.co.jp");
     }
 
+    // Changes user type from EMPLOYEE to CUSTOMER when domain does not match
     @Test
-    void changeEmail_shouldConvertEmployeeToCustomerCorrectly() {
-        // Changes user type from EMPLOYEE to CUSTOMER when domain does not match
+    void changeEmail_convertEmployee_CustTEST() {
         userController.changeEmail("1", "alice@example.com");
-
         Optional<Map<String, String>> user = database.getUserById("1");
         assertEquals("alice@example.com", user.get().get("email"));
         assertEquals("CUSTOMER", user.get().get("userType"));
@@ -62,19 +61,19 @@ public class UserControllerTest {
         verify(mailer).sendEmailChangedMessage("1", "alice@example.com");
     }
 
+    // Keeps the user type unchanged if domain remains the same
     @Test
-    void changeEmail_shouldRetainUserTypeIfDomainDoesNotChange() {
-        // Keeps the user type unchanged if domain remains the same
+    void changeEmail_RetainUserType_Domain_NotChangeTEST() {
         userController.changeEmail("1", "alice.new@loglass.co.jp");
-
         Optional<Map<String, String>> user = database.getUserById("1");
         assertEquals("EMPLOYEE", user.get().get("userType"));
         assertEquals("2", database.getCompany().get("numberOfEmployees"));
         verify(mailer).sendEmailChangedMessage("1", "alice.new@loglass.co.jp");
     }
 
+    // Throws exception when user ID does not exist
     @Test
-    void changeEmail_shouldThrowExceptionForInvalidUserId() {
+    void changeEmail_throwException_InvalidUserIdTEST() {
         // Throws exception when user ID does not exist
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> userController.changeEmail("999", "test@example.com"));
@@ -82,88 +81,98 @@ public class UserControllerTest {
         verifyNoInteractions(mailer);
     }
 
+    // Throws exception for Invalid email address
     @Test
-    void changeEmail_shouldThrowExceptionForInvalidEmailFormat() {
-        // Throws exception for malformed email address
+    void changeEmail_invalidEmailFormatTEST() {
         assertThrows(IllegalArgumentException.class,
                 () -> userController.changeEmail("1", "invalid-email"));
         verifyNoInteractions(mailer);
     }
 
+    //  if new email is same as current email
     @Test
-    void changeEmail_shouldDoNothingIfEmailUnchanged() {
-        // Returns early if new email is same as current email
+    void changeEmail_emailUnchangedTEST() {
         userController.changeEmail("1", "alice@loglass.co.jp");
         assertEquals("2", database.getCompany().get("numberOfEmployees"));
         verifyNoInteractions(mailer);
     }
 
+    //  employee count to 0 when  both employees to customers
     @Test
-    void changeEmail_shouldHandleZeroEmployeeCountCorrectly() {
-        // Adjusts employee count to 0 after demoting both employees to customers
+    void changeEmail_employeeCountTEST() {
         userController.changeEmail("1", "alice@example.com");
         userController.changeEmail("2", "bob@example.com");
         assertEquals("0", database.getCompany().get("numberOfEmployees"));
     }
 
+    // Allows special characters  email
     @Test
-    void changeEmail_shouldAcceptSpecialCharacterEmails() {
-        // Allows special characters in local part of email
+    void changeEmail_specialCharacterEmailsTEST() {
         userController.changeEmail("1", "alice+test@loglass.co.jp");
         assertEquals("alice+test@loglass.co.jp", database.getUserById("1").get().get("email"));
     }
 
+    // Changes user type to CUSTOMER for non-company domains
     @Test
-    void changeEmail_shouldConvertToCustomerForExternalDomains() {
-        // Changes user type to CUSTOMER for non-company domains
+    void changeEmail_convertToCustomer() {
         userController.changeEmail("1", "alice@gmail.com");
         assertEquals("CUSTOMER", database.getUserById("1").get().get("userType"));
     }
 
+    //   email is null
     @Test
-    void changeEmail_shouldThrowExceptionForNullEmail() {
-        // Throws exception when email is null
-        assertThrows(IllegalArgumentException.class, () ->
-                userController.changeEmail("1", null));
+    void changeEmail_exceptionForNullEmailTEST() {
+        try {
+            userController.changeEmail("1", null);
+            fail("Expected IllegalArgumentException ");
+        }catch (IllegalArgumentException ex){
+            // test pass as full string is matched
+            assertEquals("Invalid email format: null",ex.getMessage());
+        }
+
+
     }
 
+    // Throws exception when id , email is null
     @Test
-    void userid_shouldThrowExceptionForNullUserId() {
-        // Throws exception when email is null
+    void userid_exceptionForNullEmail_UserIdTEST() {
         assertThrows(IllegalArgumentException.class, () ->
                 userController.changeEmail(null, null));
     }
 
+    // Throws exception when email is an empty
     @Test
-    void changeEmail_shouldThrowExceptionForEmptyEmail() {
-        // Throws exception when email is an empty string
+    void changeEmail_emptyEmailTEST() {
         assertThrows(IllegalArgumentException.class, () ->
                 userController.changeEmail("1", ""));
     }
 
+    //   email with no  @ symbol
     @Test
-    void changeEmail_shouldThrowExceptionForMissingAtSymbol() {
-        // Throws exception when email lacks @ symbol
+    void changeEmail_missingAtSymbolTEST() {
+
         assertThrows(IllegalArgumentException.class, () ->
                 userController.changeEmail("1", "alice.loglass.co.jp"));
     }
 
+    //  NullPointerException if "email" field is missing in user data
     @Test
-    void changeEmail_shouldThrowExceptionIfUserMissingEmailField() {
-        // Throws NullPointerException if "email" field is missing in user data
-        Map<String, String> brokenUser = new HashMap<>();
-        brokenUser.put("userId", "99");
-        brokenUser.put("userType", "EMPLOYEE");
-        brokenUser.put("isEmailConfirmed", "true");
-        database.saveUser(brokenUser);
+    void changeEmail_userMissingEmailFieldTEST() {
+        Map<String, String> mapUser = new HashMap<>();
+        mapUser.put("userId", "99");
+        mapUser.put("userType", "EMPLOYEE");
+        mapUser.put("isEmailConfirmed", "true");
+        database.saveUser(mapUser);
 
         assertThrows(NullPointerException.class, () ->
                 userController.changeEmail("99", "test@loglass.co.jp"));
     }
 
-    /*@Test
-    void changeEmail_shouldDefaultUnconfirmedIfIsEmailConfirmedMissing() {
-        // Add a user without isEmailConfirmed to the list directly
+    /*
+     // Add a user without isEmailConfirmed to the list directly
+    @Test
+    void changeEmail_emailConfirmedMissingTest() {
+
         Map<String, String> userWithoutConfirmation = new HashMap<>();
         userWithoutConfirmation.put("userId", "98");
         userWithoutConfirmation.put("email", "no.confirm@loglass.co.jp");

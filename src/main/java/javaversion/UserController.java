@@ -22,7 +22,12 @@ public class UserController {
         this.mailer = Objects.requireNonNull(mailer);
     }
 
-
+/**
+* email changes main method take 2 params
+ * @param newEmail
+ * @param userId
+*
+ */
     public void changeEmail(String userId, String newEmail) {
         // Validate email format
         if (userId==null ){

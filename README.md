@@ -50,6 +50,7 @@ Edge Case Scenarios
 11. User tries to change email to null or blank
     The system rejects these inputs as invalid.
 
+![img.png](img.png)
 
 ## Running the Project
 

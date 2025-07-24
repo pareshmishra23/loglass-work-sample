@@ -57,3 +57,4 @@ Desktop.ini
 *.rar.idea/
 build/
 .gradle/
+!gradle/wrapper/gradle-wrapper.jar
